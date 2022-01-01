@@ -1,31 +1,109 @@
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Scanner;
 
-public class HashTableProblem {
-    static Scanner SCAN = new Scanner(System.in);
-    static Hashtable<String,Integer> wordsCount = new Hashtable<>();
+class MyMapNode{
 
-    static String userInput() {
-        System.out.println("Please enter the string with duplicate words");
-        return SCAN.nextLine();
+    int hashcode;
+    String key;
+    Integer value;
+    MyMapNode next;
+
+    MyMapNode(String key,Integer value){
+        this.key = key;
+        this.value = value;
+        this.hashcode = key.hashCode();
+        this.next = null;
+
     }
 
-    public static void main(String[] args) {
-        String[] words = userInput().split(" ",0);
-        for( String word : words ) {
-            wordsCount.put(word, 0);
-        }
-        for( String compareWord : words ) {
-            for ( String key : wordsCount.keySet() ) {
-                if (compareWord.equals(key)) {
-                    Integer value = wordsCount.get(key);
-                    value++;
-                    wordsCount.put(key, value);
+    public MyMapNode getNext() {
+        return next;
+    }
+
+}
+
+class AllOperations{
+
+    int arraySize = 10;
+    public final MyMapNode[] bucket = new MyMapNode[arraySize];
+
+    Integer returnIndexValueOfHashcode(int hash){
+        return Math.abs(hash % arraySize);
+    }
+
+    public void putMethod(String key, Integer val){
+
+        Integer index = returnIndexValueOfHashcode(key.hashCode());
+
+        if ( bucket[index] == null ){
+            bucket[index] = new MyMapNode(key,val);
+        }else if( bucket[index] != null ){
+            MyMapNode temp = bucket[index];
+            while ( temp.next != null ) {
+                if (temp.key.equals(key)) {
+                    int newVal = temp.value;
+                    newVal++;
+                    temp.value = newVal;
+                    break;
+                }else{
+                    temp = temp.getNext();
                 }
+
+            }
+            if (temp.key.equals(key)) {
+                int newVal = temp.value;
+                newVal++;
+                temp.value = newVal;
+            }else{
+                temp.next = new MyMapNode(key,val);
             }
         }
-        System.out.println(wordsCount);
+
+    }
+
+    Integer getValue(String key){
+        Integer index = returnIndexValueOfHashcode(key.hashCode());
+        MyMapNode temp = bucket[index];
+        if ( temp.key.equals(key) ){
+            return temp.value;
+        }
+        while( temp.next != null ){
+            if ( temp.key.equals(key) ){
+                return temp.value;
+            }else{
+                temp = temp.next;
+            }
+        }
+        return temp.value;
+    }
+
+    void printBucket(){
+        for ( int i = 0; i < bucket.length; i++ ) {
+            MyMapNode temp = bucket[i];
+            if (temp != null) {
+                while ( temp.next != null ) {
+                    System.out.print(" key : " + temp.key + ", value : " + temp.value);
+                    temp = temp.next;
+                }
+                System.out.println(" key : " + temp.key + ", value : " + temp.value);
+
+            }else{
+                System.out.println(" null ");
+            }
+
+        }
     }
 }
 
+public class HashTableProblem {
+
+    public static void main(String[] args) {
+        AllOperations allop = new AllOperations();
+        String givenValue = "Paranoids are not paranoid because they are paranoid but because they keep putting themselves deliberately into paranoid avoidable situations";
+        String[] words = givenValue.split(" ",0);
+        System.out.println(givenValue);
+        for ( String str : words ) {
+            allop.putMethod(str,1);
+        }
+        allop.printBucket();
+        System.out.println(allop.getValue("because"));
+    }
+}
