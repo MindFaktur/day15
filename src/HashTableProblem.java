@@ -75,6 +75,35 @@ class AllOperations{
         return temp.value;
     }
 
+    void removeKeyValue(String key){
+        Integer index = returnIndexValueOfHashcode(key.hashCode());
+        MyMapNode temp = bucket[index];
+        MyMapNode prev = temp;
+        if ( temp.key.equals(key) && temp.next == null){
+            bucket[index] = null;
+        }
+        else if( temp.key.equals(key) && temp.next != null ){
+
+            MyMapNode temp1 = temp.next;
+            temp = null;
+            bucket[index] = temp1;
+
+        }
+        else {
+
+            while( temp.next != null ) {
+                if (temp.key.equals(key)) {
+                    prev.next = temp.next;
+                    temp = null;
+                } else {
+                    temp = temp.next;
+                }
+            }
+        }
+        prev.next = null;
+        temp = null;
+    }
+
     void printBucket(){
         for ( int i = 0; i < bucket.length; i++ ) {
             MyMapNode temp = bucket[i];
@@ -104,6 +133,8 @@ public class HashTableProblem {
             allop.putMethod(str,1);
         }
         allop.printBucket();
-        System.out.println(allop.getValue("because"));
+        allop.removeKeyValue("avoidable");
+        allop.printBucket();
+
     }
 }
